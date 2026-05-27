@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión - HomeAway</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body class="pagina-auth">
+    <div class="contenedor-auth">
+        <!-- Panel Formulario (Izquierda) -->
+        <div class="panel-formulario">
+          <div class="logo-auth">
+                <a href="index.php" style="display: inline-block; cursor: pointer;">
+                    <img src="../assets/img/Logo_azul.png" alt="HomeAway Logo" style="display: block;">
+                </a>
+            </div>
+
+            <div class="card-formulario">
+                <h1 class="titulo-auth">Iniciar sesión</h1>
+
+                <form class="formulario-auth" id="formLogin">
+                    <div class="campo-auth">
+                        <label for="email" class="label-auth">Correo electrónico:</label>
+                        <input type="email" id="email" name="email" class="input-auth" required>
+                    </div>
+
+                    <div class="campo-auth">
+                        <label for="password" class="label-auth">Contraseña:</label>
+                        <input type="password" id="password" name="password" class="input-auth" required>
+                    </div>
+
+                    <button type="submit" class="btn-submit-auth">Iniciar sesión</button>
+                </form>
+            </div>
+        </div>
+
+      
+        <div class="panel-cta">
+            <div class="contenido-cta">
+                <h2 class="titulo-cta">¿No tienes cuenta?</h2>
+                <p class="texto-cta">Regístrate para disfrutar de los mejores viajes por parte de nosotros</p>
+                <button class="btn-cta" onclick="window.location.href='Registro.html'">Registrarse</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/javascript/main.js"></script>
+</body>
+</html>

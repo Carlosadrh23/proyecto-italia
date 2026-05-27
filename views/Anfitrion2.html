@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homeaway - Confirma tu dirección</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body class="pagina-tipo-propiedad">
+    <div class="seccion-izquierda">
+        <div class="logo-container">
+            <img src="../assets/img/Logo_blanco.png" alt="HomeAway Logo" class="logo-login">
+        </div>
+    </div>
+
+    <div class="container container-direccion paso-2">
+        <button class="back-button" onclick="window.location.href='Anfitrion1.html'">←</button>
+
+        <h1 class="titulo-direccion">Confirma tu dirección</h1>
+        <p class="subtitle subtitle-direccion">Solo compartiremos la dirección con los huéspedes después de que hayan hecho la reservación.</p>
+
+        <form class="form-direccion" id="formDireccion">
+            <div class="grupo-input">
+                <label class="label-input">Región *</label>
+                <input type="text" class="input-field" name="region" id="region" placeholder="La paz - MX" required>
+            </div>
+
+            <div class="grupo-input">
+                <label class="label-input">Dirección *</label>
+                <input type="text" class="input-field" name="direccion" id="direccion" placeholder="Sonora" required>
+            </div>
+
+            <div class="grupo-input">
+                <label class="label-input">Departamento, habitación, etc. (si corresponde)</label>
+                <input type="text" class="input-field" name="departamento" id="departamento" placeholder="Departamento, habitación, etc.">
+            </div>
+
+            <div class="grupo-input">
+                <label class="label-input">Zona (si corresponde)</label>
+                <input type="text" class="input-field" name="zona" id="zona" placeholder="Zona">
+            </div>
+
+            <div class="grupo-input">
+                <label class="label-input">Código postal *</label>
+                <input type="text" class="input-field" name="codigoPostal" id="codigoPostal" placeholder="Código postal" maxlength="5" required>
+            </div>
+
+            <div class="grupo-input">
+                <label class="label-input">Ciudad / municipio *</label>
+                <input type="text" class="input-field" name="ciudad" id="ciudad" placeholder="La paz" required>
+            </div>
+
+            <div class="grupo-input">
+                <label class="label-input">Estado *</label>
+                <input type="text" class="input-field" name="estado" id="estado" placeholder="Baja California sur" required>
+            </div>
+
+            <button type="submit" class="boton-siguiente">Siguiente</button>
+        </form>
+    </div>
+
+    <script src="../assets/javascript/main.js"></script>
+    <script>
+        // Cargar datos guardados 
+        document.addEventListener('DOMContentLoaded', function() {
+            const datosPropiedad = JSON.parse(sessionStorage.getItem('datosPropiedad') || '{}');
+            
+            // Rellenar campos si hay datos guardados
+            if (datosPropiedad.region) document.getElementById('region').value = datosPropiedad.region;
+            if (datosPropiedad.direccion) document.getElementById('direccion').value = datosPropiedad.direccion;
+            if (datosPropiedad.departamento) document.getElementById('departamento').value = datosPropiedad.departamento;
+            if (datosPropiedad.zona) document.getElementById('zona').value = datosPropiedad.zona;
+            if (datosPropiedad.codigoPostal) document.getElementById('codigoPostal').value = datosPropiedad.codigoPostal;
+            if (datosPropiedad.ciudad) document.getElementById('ciudad').value = datosPropiedad.ciudad;
+            if (datosPropiedad.estado) document.getElementById('estado').value = datosPropiedad.estado;
+        });
+
+        // Manejar envío del formulario
+        const formDireccion = document.getElementById('formDireccion');
+        
+        formDireccion.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Obtener datos existentes del paso anterior
+            const datosPropiedad = JSON.parse(sessionStorage.getItem('datosPropiedad') || '{}');
+            
+            // Agregar los datos de dirección
+            datosPropiedad.region = document.getElementById('region').value;
+            datosPropiedad.direccion = document.getElementById('direccion').value;
+            datosPropiedad.departamento = document.getElementById('departamento').value;
+            datosPropiedad.zona = document.getElementById('zona').value;
+            datosPropiedad.codigoPostal = document.getElementById('codigoPostal').value;
+            datosPropiedad.ciudad = document.getElementById('ciudad').value;
+            datosPropiedad.estado = document.getElementById('estado').value;
+            
+            // Guardar en sessionStorage
+            sessionStorage.setItem('datosPropiedad', JSON.stringify(datosPropiedad));
+            
+            console.log('Datos completos guardados:', datosPropiedad);
+            
+            
+            window.location.href = 'PrecioXNoche.html';
+        });
+    </script>
+</body>
+</html>

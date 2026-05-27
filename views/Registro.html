@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - HomeAway</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body class="pagina-auth pagina-registro">
+    <div class="contenedor-auth">
+        <!-- Panel Formulario (ahora a la izquierda) -->
+        <div class="panel-formulario">
+            <div class="card-formulario">
+                <h1 class="titulo-auth">Registro</h1>
+
+                <form class="formulario-auth" id="formRegistro">
+                    <div class="campo-auth">
+                        <label for="nombre" class="label-auth">Nombre:</label>
+                        <input type="text" id="nombre" name="nombre" class="input-auth" required>
+                    </div>
+
+                    <div class="campo-auth">
+                        <label for="email" class="label-auth">Correo electrónico:</label>
+                        <input type="email" id="email" name="email" class="input-auth" required>
+                    </div>
+
+                    <div class="campo-auth">
+                        <label for="password" class="label-auth">Contraseña:</label>
+                        <input type="password" id="password" name="password" class="input-auth" required>
+                    </div>
+
+                    <button type="submit" class="btn-submit-auth">Registrarse</button>
+                </form>
+            </div>
+        </div>
+
+        
+        <div class="panel-cta" style="position: relative;">
+            <div class="logo-auth" style="position: absolute; top: 30px; left: 30px; z-index: 10; display: block !important;">
+                <a href="index.php" style="display: inline-block; cursor: pointer;">
+                    <img src="../assets/img/Logo_blanco.png" alt="HomeAway Logo" style="max-width: 150px; height: auto; display: block;">
+                </a>
+            </div>
+            <div class="contenido-cta">
+                <h2 class="titulo-cta">¿Ya tienes cuenta?</h2>
+                <p class="texto-cta">Inicia sesión para disfrutar de los mejores viajes por parte de nosotros</p>
+                <button class="btn-cta" onclick="window.location.href='Login.html'">Iniciar sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/javascript/main.js"></script>
+</body>
+</html>

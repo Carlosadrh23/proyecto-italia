@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Condominio en Ciudad de México - HomeAway</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body class="pagina-principal">
+  
+   <header class="header">
+    <img src="../assets/img/Logo_azul.png" alt="Logo" class="logo">
+    
+    <div class="menu-container">
+        <div class="icono-usuario" id="iconoUsuario" style="display: none;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        </div>
+        
+        <div class="menu-hamburguesa">
+            <button class="boton-menu">
+                <span class="linea"></span>
+                <span class="linea"></span>
+                <span class="linea"></span>
+            </button>
+            
+            <div class="dropdown-menu" id="menuSinSesion">
+                <a href="Login.html" class="menu-item">Iniciar sesión / Registrarse</a>
+                <a href="Anfitrion1.html" class="menu-item">Conviértete en anfitrión</a>
+            </div>
+            
+            <div class="dropdown-menu" id="menuConSesion" style="display: none;">
+                <div class="user-info-menu">
+                    <strong id="nombreUsuarioMenu">Usuario</strong>
+                    <small id="emailUsuarioMenu">email@ejemplo.com</small>
+                </div>
+                <hr style="margin: 8px 0; border: none; border-top: 1px solid #EBEBEB;">
+                <a href="Perfil.html" class="menu-item">Mi perfil</a>
+                <a href="Anfitrion1.html" class="menu-item">Conviértete en anfitrión</a>
+                <a href="CerrarSesion.php" class="menu-item">Cerrar sesión</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <div class="search-bar">
+        <div class="search-option">
+            <span class="label">Destino</span>
+            <span class="value">Buscar destinos</span>
+        </div>
+        
+        <div class="search-option">
+            <span class="label">Fechas</span>
+            <span class="value">Agregar fechas</span>
+        </div>
+        
+        <div class="search-option">
+            <span class="label">Huéspedes</span>
+            <span class="value">¿Cuántos?</span>
+        </div>
+        
+        <button class="search-button">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+        </button>
+    </div>
+
+    <h1>Condominio en Ciudad de México</h1>
+
+    <div class="propiedades">
+        <div class="condominio">
+            <div class="contenedor-img">
+                <img src="../assets/img/condominio.png" alt="Condominio en Ciudad de México" class="img-condominio">
+            </div>
+            <div class="info-condominio">
+                <h3 class="titulo-condominio">Condominio en Ciudad de México</h3>
+                <p class="precio">$2,500 MXN <span class="noches">por 2 noches</span></p>
+                <div class="rating">
+                    <span class="estrella">★</span>
+                    <span class="valor-rating">4.9</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón de Reservar fijo -->
+    <button class="boton-reservar-fijo" onclick="abrirModalReserva()">
+        Reservar
+    </button>
+
+    <!-- Modal de Reservación -->
+    <div class="modal-reserva" id="modalReserva" onclick="cerrarModalSiFueraClick(event)">
+        <div class="modal-contenido">
+            <button class="boton-cerrar" onclick="cerrarModalReserva()">×</button>
+            
+            <div class="modal-header">
+                <div class="precio-modal">$2,500 MXN</div>
+                <div class="noches-modal">por 2 noches</div>
+            </div>
+
+            <div class="fila-fechas">
+                <div class="campo-fecha">
+                    <label class="label-fecha">Llegada</label>
+                    <input type="date" class="input-fecha" id="fechaLlegada" placeholder="Agregar fecha">
+                </div>
+                <div class="campo-fecha">
+                    <label class="label-fecha">Salida</label>
+                    <input type="date" class="input-fecha" id="fechaSalida" placeholder="Agregar fecha">
+                </div>
+            </div>
+
+            <div class="campo-huespedes">
+                <label class="label-huespedes">Huéspedes</label>
+                <div class="contador-huespedes">
+                    <button class="boton-contador" onclick="cambiarHuespedes(-1)" id="btnMenos" disabled>-</button>
+                    <span class="numero-huespedes" id="numHuespedes">1</span>
+                    <button class="boton-contador" onclick="cambiarHuespedes(1)">+</button>
+                </div>
+            </div>
+
+            <button class="boton-verificar" onclick="irAPagar()">
+                Reservar ahora
+            </button>
+        </div>
+    </div>
+
+    <script src="../assets/javascript/main.js"></script>
+    <script>
+        // ID de esta propiedad (puedes ajustarlo si tienes un ID real en la BD)
+        const PROPIEDAD_ID = 1;
+        let numHuespedes = 1;
+
+        function abrirModalReserva() {
+            document.getElementById('modalReserva').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalReserva() {
+            document.getElementById('modalReserva').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function cerrarModalSiFueraClick(event) {
+            if (event.target.id === 'modalReserva') {
+                cerrarModalReserva();
+            }
+        }
+
+        function cambiarHuespedes(cambio) {
+            numHuespedes += cambio;
+            if (numHuespedes < 1) numHuespedes = 1;
+            
+            document.getElementById('numHuespedes').textContent = numHuespedes;
+            document.getElementById('btnMenos').disabled = numHuespedes === 1;
+        }
+
+        function irAPagar() {
+            const fechaLlegada = document.getElementById('fechaLlegada').value;
+            const fechaSalida = document.getElementById('fechaSalida').value;
+            
+            if (!fechaLlegada || !fechaSalida) {
+                alert('Por favor selecciona las fechas de llegada y salida');
+                return;
+            }
+
+            if (new Date(fechaLlegada) >= new Date(fechaSalida)) {
+                alert('La fecha de salida debe ser posterior a la fecha de llegada');
+                return;
+            }
+
+            // Redirigir a la página de pago con los datos
+            const url = `ConfirmarPago.php?propiedad_id=${PROPIEDAD_ID}&fecha_inicio=${fechaLlegada}&fecha_fin=${fechaSalida}&num_huespedes=${numHuespedes}`;
+            window.location.href = url;
+        }
+
+        // Cerrar con ESC
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('modalReserva').classList.contains('active')) {
+                if (e.key === 'Escape') {
+                    cerrarModalReserva();
+                }
+            }
+        });
+
+        // Establecer fecha mínima como hoy
+        const hoy = new Date().toISOString().split('T')[0];
+        document.getElementById('fechaLlegada').setAttribute('min', hoy);
+        document.getElementById('fechaSalida').setAttribute('min', hoy);
+    </script>
+</body>
+</html>
