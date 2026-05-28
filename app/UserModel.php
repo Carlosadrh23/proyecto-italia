@@ -95,9 +95,10 @@ class UserModel {
                 'success' => true,
                 'message' => 'Inicio de sesión exitoso',
                 'usuario' => [
-                    'id' => $usuario['id'],
+                    'id'     => $usuario['id'],
                     'nombre' => $usuario['nombre'],
-                    'email' => $usuario['email']
+                    'email'  => $usuario['email'],
+                    'foto'   => $usuario['foto'] ?? null
                 ]
             ];
 

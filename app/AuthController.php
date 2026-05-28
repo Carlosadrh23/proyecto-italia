@@ -34,8 +34,9 @@ switch ($accion) {
         if ($resultado['success']) {
 
             $_SESSION['user_id'] = $resultado['user_id'];
-            $_SESSION['nombre'] = $data['nombre'];
-            $_SESSION['email'] = $data['email'];
+            $_SESSION['nombre']  = $data['nombre'];
+            $_SESSION['email']   = $data['email'];
+            $_SESSION['foto']    = null;
         }
 
         echo json_encode($resultado);
@@ -55,14 +56,10 @@ switch ($accion) {
 
         if ($resultado['success']) {
 
-            $_SESSION['user_id'] =
-                $resultado['usuario']['id'];
-
-            $_SESSION['nombre'] =
-                $resultado['usuario']['nombre'];
-
-            $_SESSION['email'] =
-                $resultado['usuario']['email'];
+            $_SESSION['user_id'] = $resultado['usuario']['id'];
+            $_SESSION['nombre']  = $resultado['usuario']['nombre'];
+            $_SESSION['email']   = $resultado['usuario']['email'];
+            $_SESSION['foto']    = $resultado['usuario']['foto'] ?? null;
         }
 
         echo json_encode($resultado);
@@ -115,14 +112,12 @@ switch ($accion) {
                 FROM usuarios
                 WHERE id = $userId";
 
-        $resultadoConsulta =
-            $conexion->query($sql);
+        $resultadoConsulta = $conexion->query($sql);
 
         if ($resultadoConsulta &&
             $resultadoConsulta->num_rows > 0) {
 
-            $usuario =
-                $resultadoConsulta->fetch_assoc();
+            $usuario = $resultadoConsulta->fetch_assoc();
 
             echo json_encode([
                 'success' => true,
@@ -185,10 +180,9 @@ switch ($accion) {
 
         $userId = $_SESSION['user_id'];
 
-        $extension = pathinfo($archivo['name'], PATHINFO_EXTENSION);
+        $extension    = pathinfo($archivo['name'], PATHINFO_EXTENSION);
         $nombreArchivo = 'usuario_' . $userId . '_' . time() . '.' . $extension;
-
-        $rutaDestino = __DIR__ . '/../assets/img/usuarios/' . $nombreArchivo;
+        $rutaDestino  = __DIR__ . '/../assets/img/usuarios/' . $nombreArchivo;
 
         if (!move_uploaded_file($archivo['tmp_name'], $rutaDestino)) {
             echo json_encode([
@@ -211,7 +205,7 @@ switch ($accion) {
             echo json_encode([
                 'success' => true,
                 'message' => 'Foto actualizada',
-                'foto' => $nombreArchivo
+                'foto'    => $nombreArchivo
             ]);
 
         } else {
@@ -234,8 +228,7 @@ switch ($accion) {
 
         if (ini_get("session.use_cookies")) {
 
-            $params =
-                session_get_cookie_params();
+            $params = session_get_cookie_params();
 
             setcookie(
                 session_name(),
@@ -268,7 +261,7 @@ switch ($accion) {
             echo json_encode([
                 'success' => true,
                 'logueado' => true,
-                'usuario' => [
+                'usuario'  => [
                     'id'     => $_SESSION['user_id'],
                     'nombre' => $_SESSION['nombre'],
                     'email'  => $_SESSION['email'],
