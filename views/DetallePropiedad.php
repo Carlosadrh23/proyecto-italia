@@ -304,7 +304,8 @@ if ($propiedadId <= 0) {
         <div class="modal-body">
 
             <div class="amenidades-grid">
-                                <!-- Baño -->
+
+                <!-- Baño -->
                 <div class="amenidad-item">
                     <span class="amenidad-texto">🚿 Baño</span>
                 </div>
@@ -430,7 +431,7 @@ async function verificarSesionYActualizarMenu(){
         return false;
     }
 }
-    
+
 // ==========================
 // CARGAR DETALLE
 // ==========================
@@ -815,9 +816,65 @@ async function enviarValoracion(){
 }
 
 // ==========================
+// CALCULAR TOTAL
+// ==========================
+function calcularTotal(){
+
+    const fechaInicio =
+        document.getElementById(
+            'fechaLlegada'
+        ).value;
+
+    const fechaFin =
+        document.getElementById(
+            'fechaSalida'
+        ).value;
+
+    if(!fechaInicio || !fechaFin || !propiedadActual) return;
+
+    const dias =
+        (new Date(fechaFin) - new Date(fechaInicio))
+        / (1000 * 60 * 60 * 24);
+
+    if(dias <= 0) return;
+
+    const precioPorNoche =
+        parseFloat(propiedadActual.precio_noche);
+
+    const total = dias * precioPorNoche;
+
+    document
+        .getElementById('infoReserva')
+        .style.display = 'block';
+
+    document
+        .getElementById('nochesSeleccionadas')
+        .textContent = dias;
+
+    document
+        .getElementById('precioPorNoche')
+        .textContent =
+        '$' + precioPorNoche.toLocaleString('es-MX');
+
+    document
+        .getElementById('precioTotal')
+        .textContent =
+        '$' + total.toLocaleString('es-MX');
+}
+
+// ==========================
 // MODAL RESERVA
 // ==========================
 function abrirModalReserva(){
+
+    if(propiedadActual){
+        const precio =
+            parseFloat(propiedadActual.precio_noche)
+            .toLocaleString('es-MX');
+        document
+            .getElementById('precioModal')
+            .textContent = '$' + precio + ' MXN';
+    }
 
     document
         .getElementById(
@@ -939,9 +996,39 @@ function cambiarHuespedes(
 // ==========================
 function confirmarReservacion(){
 
-    alert(
-        'Continuar con reservación'
-    );
+    if(!usuarioLogueado){
+        alert('Debes iniciar sesión para reservar');
+        window.location.href = 'Login.html';
+        return;
+    }
+
+    const fechaInicio =
+        document.getElementById('fechaLlegada').value;
+
+    const fechaFin =
+        document.getElementById('fechaSalida').value;
+
+    if(!fechaInicio || !fechaFin){
+        alert('Selecciona las fechas');
+        return;
+    }
+
+    if(fechaInicio >= fechaFin){
+        alert('La fecha de salida debe ser después de la llegada');
+        return;
+    }
+
+    if(numHuespedes <= 0){
+        alert('Selecciona al menos 1 huésped');
+        return;
+    }
+
+    window.location.href =
+        'ConfirmarYPagar.php' +
+        '?propiedad_id=' + propiedadId +
+        '&fecha_inicio=' + fechaInicio +
+        '&fecha_fin='    + fechaFin +
+        '&num_huespedes=' + numHuespedes;
 }
 
 // ==========================
@@ -954,6 +1041,14 @@ document.addEventListener(
         await verificarSesionYActualizarMenu();
 
         await cargarDetallePropiedad();
+
+        document
+            .getElementById('fechaLlegada')
+            .addEventListener('change', calcularTotal);
+
+        document
+            .getElementById('fechaSalida')
+            .addEventListener('change', calcularTotal);
     }
 );
 

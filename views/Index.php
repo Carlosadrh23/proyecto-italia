@@ -185,8 +185,25 @@ async function verificarSesion() {
             menuConSesion.style.display = 'block';
             iconoUsuario.style.display = 'flex';
 
-            document.getElementById('nombreUsuarioMenu').textContent =
-                resultado.usuario.nombre;
+// Mostrar foto si tiene, si no el SVG
+if (resultado.usuario.foto) {
+    iconoUsuario.innerHTML = `
+        <img
+            src="/homeaway/Airbnb/assets/img/usuarios/${resultado.usuario.foto}"
+            style="
+                width:32px;
+                height:32px;
+                border-radius:50%;
+                object-fit:cover;
+                border:2px solid #5B8A8F;
+            "
+            onerror="this.style.display='none'"
+        >
+    `;
+}
+
+document.getElementById('nombreUsuarioMenu').textContent =
+    resultado.usuario.nombre;
 
             document.getElementById('emailUsuarioMenu').textContent =
                 resultado.usuario.email;

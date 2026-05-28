@@ -162,6 +162,23 @@ async function verificarSesion() {
 
             if (iconoUsuario) {
                 iconoUsuario.style.display = 'flex';
+
+                // Si tiene foto, mostrarla en lugar del SVG
+                if (resultado.usuario.foto) {
+                    iconoUsuario.innerHTML = `
+                        <img
+                            src="/homeaway/Airbnb/assets/img/usuarios/${resultado.usuario.foto}"
+                            style="
+                                width:32px;
+                                height:32px;
+                                border-radius:50%;
+                                object-fit:cover;
+                                border:2px solid #5B8A8F;
+                            "
+                            onerror="this.style.display='none'"
+                        >
+                    `;
+                }
             }
 
         } else {
