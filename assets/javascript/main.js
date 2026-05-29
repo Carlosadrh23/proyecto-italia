@@ -13,12 +13,18 @@ function inicializarRegistro() {
 
         e.preventDefault();
 
-        const nombre = document.getElementById('nombre').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
+        const nombre    = document.getElementById('nombre').value.trim();
+        const email     = document.getElementById('email').value.trim();
+        const telefono  = document.getElementById('telefono').value.trim();
+        const password  = document.getElementById('password').value.trim();
 
-        if (!nombre || !email || !password) {
+        if (!nombre || !email || !telefono || !password) {
             alert('Completa todos los campos');
+            return;
+        }
+
+        if (telefono.length !== 10 || !/^\d+$/.test(telefono)) {
+            alert('El número de teléfono debe tener exactamente 10 dígitos');
             return;
         }
 
@@ -34,6 +40,7 @@ function inicializarRegistro() {
                     accion: 'registro',
                     nombre,
                     email,
+                    telefono,
                     password
                 })
             });

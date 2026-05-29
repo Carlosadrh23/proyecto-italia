@@ -10,11 +10,10 @@ class UserModel {
 
         $db = new conexionController();
         $this->conexion = $db->getConexion();
-
     }
 
     // REGISTRAR USUARIO
-    public function registrarUsuario($nombre, $email, $password) {
+    public function registrarUsuario($nombre, $email, $password, $telefono = null) {
 
         try {
 
@@ -24,7 +23,6 @@ class UserModel {
             $stmt->execute([$email]);
 
             if($stmt->fetch()) {
-
                 return [
                     'success' => false,
                     'message' => 'El correo ya está registrado'
@@ -35,13 +33,12 @@ class UserModel {
             $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
             // Insertar usuario
-            $sql = "INSERT INTO usuarios(nombre, email, password)
-                    VALUES(?,?,?)";
+            $sql = "INSERT INTO usuarios(nombre, email, password, telefono)
+                    VALUES(?, ?, ?, ?)";
 
             $stmt = $this->conexion->prepare($sql);
 
-            if($stmt->execute([$nombre, $email, $passwordHash])) {
-
+            if($stmt->execute([$nombre, $email, $passwordHash, $telefono])) {
                 return [
                     'success' => true,
                     'message' => 'Usuario registrado correctamente',
@@ -55,12 +52,10 @@ class UserModel {
             ];
 
         } catch(PDOException $e) {
-
             return [
                 'success' => false,
                 'message' => $e->getMessage()
             ];
-
         }
     }
 
@@ -76,7 +71,6 @@ class UserModel {
             $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if(!$usuario) {
-
                 return [
                     'success' => false,
                     'message' => 'Usuario no encontrado'
@@ -84,7 +78,6 @@ class UserModel {
             }
 
             if(!password_verify($password, $usuario['password'])) {
-
                 return [
                     'success' => false,
                     'message' => 'Contraseña incorrecta'
@@ -95,20 +88,19 @@ class UserModel {
                 'success' => true,
                 'message' => 'Inicio de sesión exitoso',
                 'usuario' => [
-                    'id'     => $usuario['id'],
-                    'nombre' => $usuario['nombre'],
-                    'email'  => $usuario['email'],
-                    'foto'   => $usuario['foto'] ?? null
+                    'id'       => $usuario['id'],
+                    'nombre'   => $usuario['nombre'],
+                    'email'    => $usuario['email'],
+                    'foto'     => $usuario['foto']     ?? null,
+                    'telefono' => $usuario['telefono'] ?? null
                 ]
             ];
 
         } catch(PDOException $e) {
-
             return [
                 'success' => false,
                 'message' => $e->getMessage()
             ];
-
         }
     }
 }

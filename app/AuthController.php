@@ -25,11 +25,12 @@ switch ($accion) {
     // ==========================================
     case 'registro':
 
-        $resultado = $model->registrarUsuario(
-            $data['nombre'],
-            $data['email'],
-            $data['password']
-        );
+       $resultado = $model->registrarUsuario(
+        $data['nombre'],
+        $data['email'],
+        $data['password'],
+        $data['telefono'] ?? null
+    );
 
         if ($resultado['success']) {
 
@@ -103,14 +104,15 @@ switch ($accion) {
 
         $conexion->set_charset("utf8");
 
-        $sql = "SELECT
-                    id,
-                    nombre,
-                    email,
-                    fecha_registro,
-                    foto
-                FROM usuarios
-                WHERE id = $userId";
+            $sql = "SELECT
+                id,
+                nombre,
+                email,
+                fecha_registro,
+                foto,
+                telefono
+            FROM usuarios
+            WHERE id = $userId";
 
         $resultadoConsulta = $conexion->query($sql);
 

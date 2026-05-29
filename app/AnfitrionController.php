@@ -200,9 +200,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($conexion->query($sql)) {
 
-        echo json_encode([
-            "success" => true
-        ]);
+    echo json_encode([
+        "success" => true,
+        "datos" => [
+            "tipo"      => $tipoAlojamiento,
+            "direccion" => $direccion,
+            "ciudad"    => $ciudad,
+            "estado"    => $estado,
+            "precio"    => $precioNoche,
+            "noches"    => $numeroNoches,
+            "imagenes"  => $nombreImagen ? 1 : 0
+        ]
+    ]);
 
     } else {
 

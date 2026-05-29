@@ -525,7 +525,7 @@ function mostrarDetalle(propiedad){
 
     const html = `
 
-        <h1>
+        <h1 style="max-width:1280px; margin:0 auto; padding:20px;">
             ${propiedad.tipo_alojamiento}
             en
             ${propiedad.ciudad}
