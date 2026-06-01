@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - HomeAway</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="chat-header">
+
+        <button class="chat-header-back" onclick="history.back()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.5">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </button>
+
+        <div class="chat-header-avatar" id="headerAvatar"></div>
+
+        <div class="chat-header-info">
+            <div class="chat-header-nombre" id="headerNombre">Cargando...</div>
+            <div class="chat-header-sub" id="headerSub">Cargando...</div>
+        </div>
+
+    </div>
+
+    <!-- MENSAJES -->
+    <div class="chat-mensajes" id="chatMensajes">
+        <div class="chat-loading">Cargando mensajes...</div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="chat-input-area">
+
+        <textarea
+            class="chat-input"
+            id="inputMensaje"
+            placeholder="Escribe un mensaje..."
+            rows="1"
+            onkeydown="handleEnter(event)"
+            oninput="autoResize(this)"
+        ></textarea>
+
+        <button class="chat-btn-enviar" onclick="enviarMensaje()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                 stroke="white" stroke-width="2.5">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+        </button>
+
+    </div>
+
+    <script>
+
+        const params      = new URLSearchParams(window.location.search);
+        const receptorId  = parseInt(params.get('con'));
+        let   usuarioIdYo = null;
+        let   intervalo   = null;
+
+        if (!receptorId) {
+            document.getElementById('chatMensajes').innerHTML =
+                '<div class="chat-vacio">No se especificó un usuario.</div>';
+        }
+
+        // ==========================================
+        // AUTO-RESIZE TEXTAREA
+        // ==========================================
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                enviarMensaje();
+            }
+        }
+
+        // ==========================================
+        // FORMATEAR HORA
+        // ==========================================
+        function formatHora(fechaStr) {
+            const d = new Date(fechaStr);
+            return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // ==========================================
+        // INICIALES
+        // ==========================================
+        function iniciales(nombre) {
+            if (!nombre) return '?';
+            return nombre.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        // ==========================================
+        // RENDERIZAR MENSAJES
+        // ==========================================
+        function renderMensajes(mensajes, miId) {
+
+            const contenedor = document.getElementById('chatMensajes');
+
+            if (mensajes.length === 0) {
+                contenedor.innerHTML =
+                    '<div class="chat-vacio">Sé el primero en escribir 👋</div>';
+                return;
+            }
+
+            contenedor.innerHTML = '';
+
+            mensajes.forEach(m => {
+
+                const esMio = parseInt(m.emisor_id) === parseInt(miId);
+                const wrap  = document.createElement('div');
+                wrap.className = 'chat-burbuja-wrap' + (esMio ? ' mio' : '');
+
+                const av = document.createElement('div');
+                av.className = 'chat-mini-avatar';
+                if (m.emisor_foto) {
+                    av.innerHTML = `<img src="../assets/img/usuarios/${m.emisor_foto}"
+                                        onerror="this.parentElement.textContent='${iniciales(m.emisor_nombre)}'">`;
+                } else {
+                    av.textContent = iniciales(m.emisor_nombre);
+                }
+
+                const col = document.createElement('div');
+                col.style.display       = 'flex';
+                col.style.flexDirection = 'column';
+                col.style.alignItems    = esMio ? 'flex-end' : 'flex-start';
+                col.style.maxWidth      = '65%';
+
+                const burbuja = document.createElement('div');
+                burbuja.className   = 'chat-burbuja ' + (esMio ? 'mio' : 'otro');
+                burbuja.textContent = m.mensaje;
+
+                const hora = document.createElement('div');
+                hora.className   = 'chat-burbuja-hora';
+                hora.textContent = formatHora(m.fecha);
+
+                col.appendChild(burbuja);
+                col.appendChild(hora);
+                wrap.appendChild(av);
+                wrap.appendChild(col);
+                contenedor.appendChild(wrap);
+            });
+
+            contenedor.scrollTop = contenedor.scrollHeight;
+        }
+
+        // ==========================================
+        // CARGAR CONVERSACIÓN
+        // ==========================================
+        async function cargarConversacion() {
+
+            try {
+
+                const res  = await fetch(
+                    `../app/MensajeController.php?accion=conversacion&con=${receptorId}`,
+                    { credentials: 'include' }
+                );
+
+                const data = await res.json();
+
+                if (!data.success) {
+                    if (data.message === 'Debes iniciar sesión') {
+                        window.location.href = 'Login.html';
+                    }
+                    return;
+                }
+
+                usuarioIdYo = data.usuario_id;
+
+                // Header con nombre y rol del otro
+                if (data.otro_usuario) {
+
+                    document.getElementById('headerNombre').textContent =
+                        data.otro_usuario.nombre;
+
+                    document.getElementById('headerSub').textContent =
+                        data.es_anfitrion_el_otro ? 'Anfitrión' : 'Huésped';
+
+                    document.title = `Chat con ${data.otro_usuario.nombre} - HomeAway`;
+
+                    const av = document.getElementById('headerAvatar');
+                    if (data.otro_usuario.foto) {
+                        av.innerHTML = `<img src="../assets/img/usuarios/${data.otro_usuario.foto}"
+                                            onerror="this.parentElement.textContent='${iniciales(data.otro_usuario.nombre)}'">`;
+                    } else {
+                        av.textContent = iniciales(data.otro_usuario.nombre);
+                    }
+                }
+
+                renderMensajes(data.mensajes, data.usuario_id);
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // ==========================================
+        // ENVIAR MENSAJE
+        // ==========================================
+        async function enviarMensaje() {
+
+            const input   = document.getElementById('inputMensaje');
+            const mensaje = input.value.trim();
+
+            if (!mensaje || !receptorId) return;
+
+            input.value        = '';
+            input.style.height = 'auto';
+
+            try {
+
+                const res = await fetch('../app/MensajeController.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ receptor_id: receptorId, mensaje })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    cargarConversacion();
+                } else {
+                    alert(data.message || 'Error al enviar');
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert('Error de conexión');
+            }
+        }
+
+        // ==========================================
+        // INIT
+        // ==========================================
+        if (receptorId) {
+            cargarConversacion();
+            intervalo = setInterval(cargarConversacion, 5000);
+        }
+
+        window.addEventListener('beforeunload', () => {
+            if (intervalo) clearInterval(intervalo);
+        });
+
+    </script>
+
+</body>
+</html>

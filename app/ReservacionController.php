@@ -170,12 +170,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $usuarioId = $_SESSION['user_id'];
 
+    // ← CAMBIO 1: se agrega p.anfitrion_id al SELECT
     $sql = "SELECT 
                 r.*,
                 p.tipo_alojamiento,
                 p.ciudad,
                 p.estado,
-                p.imagen_url
+                p.imagen_url,
+                p.anfitrion_id
             FROM reservaciones r
             INNER JOIN propiedades p 
             ON r.propiedad_id = p.id
@@ -189,23 +191,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     while($fila = $resultado->fetch_assoc()) {
 
         $reservaciones[] = [
-            'id' => $fila['id'],
-            'fecha_inicio' => $fila['fecha_inicio'],
-            'fecha_fin' => $fila['fecha_fin'],
+            'id'               => $fila['id'],
+            'fecha_inicio'     => $fila['fecha_inicio'],
+            'fecha_fin'        => $fila['fecha_fin'],
             'numero_huespedes' => $fila['numero_huespedes'],
-            'precio_total' => $fila['precio_total'],
-            'estado' => $fila['estado_reservacion'],
+            'precio_total'     => $fila['precio_total'],
+            'estado'           => $fila['estado_reservacion'],
             'propiedad' => [
-                'tipo' => $fila['tipo_alojamiento'],
-                'ciudad' => $fila['ciudad'],
-                'estado' => $fila['estado'],
-                'imagen' => $fila['imagen_url']
+                'tipo'         => $fila['tipo_alojamiento'],
+                'ciudad'       => $fila['ciudad'],
+                'estado'       => $fila['estado'],
+                'imagen'       => $fila['imagen_url'],
+                'anfitrion_id' => $fila['anfitrion_id']  // ← CAMBIO 2
             ]
         ];
     }
 
     echo json_encode([
-        'success' => true,
+        'success'       => true,
         'reservaciones' => $reservaciones
     ]);
 

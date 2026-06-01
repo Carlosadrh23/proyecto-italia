@@ -101,12 +101,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ELIMINAR PROPIEDAD
     // ======================================================
     $input = file_get_contents("php://input");
-    $data = json_decode($input, true);
+    $data  = json_decode($input, true);
 
     if (isset($data['accion']) && $data['accion'] === 'eliminar') {
 
         $propiedadId = intval($data['id']);
 
+        // Obtener reservaciones activas de esta propiedad
+        $sqlReservas = "SELECT id, usuario_id FROM reservaciones 
+                        WHERE propiedad_id = $propiedadId";
+        $resReservas = $conexion->query($sqlReservas);
+
+        if ($resReservas && $resReservas->num_rows > 0) {
+
+            while ($reserva = $resReservas->fetch_assoc()) {
+
+                $reservacionId = $reserva['id'];
+                $huespedId     = $reserva['usuario_id'];
+                $mensaje       = $conexion->real_escape_string(
+                    '⚠️ El anfitrión ha eliminado esta propiedad. Tu reservación ha sido cancelada y recibirás un reembolso completo. Disculpa los inconvenientes.'
+                );
+
+                // Enviar mensaje automático al huésped
+                $conexion->query("INSERT INTO mensajes 
+                    (reservacion_id, emisor_id, receptor_id, mensaje)
+                    VALUES ($reservacionId, $usuarioId, $huespedId, '$mensaje')");
+            }
+        }
+
+        // Eliminar reservaciones de la propiedad
+        $conexion->query("DELETE FROM reservaciones WHERE propiedad_id = $propiedadId");
+
+        // Limpiar mensajes huérfanos
+        $conexion->query("DELETE FROM mensajes WHERE reservacion_id NOT IN (SELECT id FROM reservaciones)");
+
+        // Eliminar la propiedad
         $sqlEliminar = "DELETE FROM propiedades
                         WHERE id = $propiedadId
                         AND anfitrion_id = $usuarioId";
@@ -134,16 +163,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ======================================================
 
     $tipoAlojamiento = $_POST['tipoAlojamiento'] ?? '';
-    $region = $_POST['region'] ?? '';
-    $direccion = $_POST['direccion'] ?? '';
-    $departamento = $_POST['departamento'] ?? '';
-    $zona = $_POST['zona'] ?? '';
-    $codigoPostal = $_POST['codigoPostal'] ?? '';
-    $ciudad = $_POST['ciudad'] ?? '';
-    $estado = $_POST['estado'] ?? '';
-    $precioNoche = $_POST['precioNoche'] ?? 0;
-    $numeroNoches = $_POST['numeroNoches'] ?? 1;
-    $descripcion = $_POST['descripcion'] ?? '';
+    $region          = $_POST['region']          ?? '';
+    $direccion       = $_POST['direccion']       ?? '';
+    $departamento    = $_POST['departamento']    ?? '';
+    $zona            = $_POST['zona']            ?? '';
+    $codigoPostal    = $_POST['codigoPostal']    ?? '';
+    $ciudad          = $_POST['ciudad']          ?? '';
+    $estado          = $_POST['estado']          ?? '';
+    $precioNoche     = $_POST['precioNoche']     ?? 0;
+    $numeroNoches    = $_POST['numeroNoches']    ?? 1;
+    $descripcion     = $_POST['descripcion']     ?? '';
 
     $nombreImagen = "";
 
@@ -154,17 +183,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($archivo['error'][0] === 0) {
 
             $nombreOriginal = $archivo['name'][0];
+            $extension      = pathinfo($nombreOriginal, PATHINFO_EXTENSION);
+            $nombreImagen   = uniqid() . "." . $extension;
+            $rutaDestino    = "../assets/img/propiedades/" . $nombreImagen;
 
-            $extension = pathinfo($nombreOriginal, PATHINFO_EXTENSION);
-
-            $nombreImagen = uniqid() . "." . $extension;
-
-            $rutaDestino = "../assets/img/propiedades/" . $nombreImagen;
-
-            move_uploaded_file(
-                $archivo['tmp_name'][0],
-                $rutaDestino
-            );
+            move_uploaded_file($archivo['tmp_name'][0], $rutaDestino);
         }
     }
 
@@ -200,18 +223,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($conexion->query($sql)) {
 
-    echo json_encode([
-        "success" => true,
-        "datos" => [
-            "tipo"      => $tipoAlojamiento,
-            "direccion" => $direccion,
-            "ciudad"    => $ciudad,
-            "estado"    => $estado,
-            "precio"    => $precioNoche,
-            "noches"    => $numeroNoches,
-            "imagenes"  => $nombreImagen ? 1 : 0
-        ]
-    ]);
+        echo json_encode([
+            "success" => true,
+            "datos"   => [
+                "tipo"      => $tipoAlojamiento,
+                "direccion" => $direccion,
+                "ciudad"    => $ciudad,
+                "estado"    => $estado,
+                "precio"    => $precioNoche,
+                "noches"    => $numeroNoches,
+                "imagenes"  => $nombreImagen ? 1 : 0
+            ]
+        ]);
 
     } else {
 
